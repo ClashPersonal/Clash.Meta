@@ -120,13 +120,6 @@ type Tun struct {
 	TunAddressPrefix    netip.Prefix     `yaml:"-" json:"-"`
 }
 
-// IPTables config
-type IPTables struct {
-	Enable           bool     `yaml:"enable" json:"enable"`
-	InboundInterface string   `yaml:"inbound-interface" json:"inbound-interface"`
-	Bypass           []string `yaml:"bypass" json:"bypass"`
-}
-
 type Sniffer struct {
 	Enable      bool
 	Sniffers    []sniffer.Type
@@ -145,7 +138,6 @@ type Experimental struct {
 type Config struct {
 	General       *General
 	Tun           *Tun
-	IPTables      *IPTables
 	DNS           *DNS
 	Experimental  *Experimental
 	Hosts         *trie.DomainTrie[netip.Addr]
@@ -222,7 +214,6 @@ type RawConfig struct {
 	Hosts         map[string]string         `yaml:"hosts"`
 	DNS           RawDNS                    `yaml:"dns"`
 	Tun           RawTun                    `yaml:"tun"`
-	IPTables      IPTables                  `yaml:"iptables"`
 	Experimental  Experimental              `yaml:"experimental"`
 	Profile       Profile                   `yaml:"profile"`
 	GeoXUrl       RawGeoXUrl                `yaml:"geox-url"`
@@ -287,11 +278,6 @@ func UnmarshalRawConfig(buf []byte) (*RawConfig, error) {
 			AutoRoute:           false,
 			AutoDetectInterface: false,
 		},
-		IPTables: IPTables{
-			Enable:           false,
-			InboundInterface: "lo",
-			Bypass:           []string{},
-		},
 		DNS: RawDNS{
 			Enable:       false,
 			IPv6:         false,
@@ -335,7 +321,6 @@ func ParseRawConfig(rawCfg *RawConfig) (*Config, error) {
 	startTime := time.Now()
 	config.Experimental = &rawCfg.Experimental
 	config.Profile = &rawCfg.Profile
-	config.IPTables = &rawCfg.IPTables
 
 	general, err := parseGeneral(rawCfg)
 	if err != nil {
