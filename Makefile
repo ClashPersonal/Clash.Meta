@@ -3,8 +3,8 @@ BINDIR=bin
 BRANCH=$(shell git branch --show-current)
 ifeq ($(BRANCH),Alpha)
 VERSION=alpha@$(shell git rev-parse --short HEAD)
-else ifeq ($(BRANCH),Beta)
-VERSION=beta-$(shell git rev-parse --short HEAD)
+else ifeq ($(BRANCH),cfm)
+VERSION=cfm@$(shell git rev-parse --short HEAD)
 else ifeq ($(BRANCH),)
 VERSION=$(shell git describe --tags)
 else
