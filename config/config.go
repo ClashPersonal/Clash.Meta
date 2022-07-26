@@ -55,6 +55,7 @@ type General struct {
 	EnableProcess bool         `json:"enable-process"`
 	Tun           Tun          `json:"tun"`
 	Sniffing      bool         `json:"sniffing"`
+	EBpf        EBpf         `json:"-"`
 }
 
 // Inbound config
@@ -118,6 +119,13 @@ type Tun struct {
 	AutoRoute           bool             `yaml:"auto-route" json:"auto-route"`
 	AutoDetectInterface bool             `yaml:"auto-detect-interface" json:"auto-detect-interface"`
 	TunAddressPrefix    netip.Prefix     `yaml:"-" json:"-"`
+	RedirectToTun       []string      `yaml:"-" json:"-"`
+}
+
+// EBpf config
+type EBpf struct {
+	RedirectToTun []string `yaml:"redirect-to-tun" json:"redirect-to-tun"`
+	AutoRedir     []string `yaml:"auto-redir" json:"auto-redir"`
 }
 
 type Sniffer struct {
@@ -220,6 +228,7 @@ type RawConfig struct {
 	Proxy         []map[string]any          `yaml:"proxies"`
 	ProxyGroup    []map[string]any          `yaml:"proxy-groups"`
 	Rule          []string                  `yaml:"rules"`
+	EBpf          EBpf                      `yaml:"ebpf"`
 }
 
 type RawGeoXUrl struct {
@@ -277,6 +286,10 @@ func UnmarshalRawConfig(buf []byte) (*RawConfig, error) {
 			DNSHijack:           []string{"0.0.0.0:53"}, // default hijack all dns query
 			AutoRoute:           false,
 			AutoDetectInterface: false,
+		},
+		EBpf: EBpf{
+			RedirectToTun: []string{},
+			AutoRedir:     []string{},
 		},
 		DNS: RawDNS{
 			Enable:       false,
@@ -412,6 +425,7 @@ func parseGeneral(cfg *RawConfig) (*General, error) {
 		GeodataLoader: cfg.GeodataLoader,
 		TCPConcurrent: cfg.TCPConcurrent,
 		EnableProcess: cfg.EnableProcess,
+		EBpf:        cfg.EBpf,
 	}, nil
 }
 

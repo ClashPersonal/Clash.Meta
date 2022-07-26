@@ -45,12 +45,6 @@ func ConfigInterfaceAddress(dev device.Device, addr netip.Prefix, forceMTU int, 
 		return err
 	}
 
-	bits := ip.BitLen()
-	ones := addr.Bits()
-	if !autoRoute {
-		ones = bits
-	}
-
 	nlAddr, err := netlink.ParseAddr(addr.String())
 	if err != nil {
 		return err
