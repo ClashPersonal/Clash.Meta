@@ -116,13 +116,16 @@ func (e *Endpoint) dispatchLoop(cancel context.CancelFunc) {
 			Data: bufferv2.View(data[:n]).ToVectorisedView(),
 		})
 
+		var p tcpip.NetworkProtocolNumber
 		switch header.IPVersion(data) {
 		case header.IPv4Version:
-			e.InjectInbound(header.IPv4ProtocolNumber, pkt)
+			p = header.IPv4ProtocolNumber
 		case header.IPv6Version:
-			e.InjectInbound(header.IPv6ProtocolNumber, pkt)
+			p = header.IPv6ProtocolNumber
 		}
-		pkt.DecRef()
+		default:
+			_ = pool.Put(data)
+			continue
 	}
 }
 
